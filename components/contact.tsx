@@ -1,6 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useRef, useState, useTransition } from "react"
+import { toast } from "sonner"
+import {
+  Field,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { submitContactForm } from "@/app/actions/contact"
 
 const contactItems = [
   {
@@ -46,35 +63,50 @@ const contactItems = [
   },
 ]
 
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  background: "#111520",
-  border: "1px solid #1e2535",
-  color: "#c8d4e8",
-  padding: "0.75rem 1rem",
-  fontSize: "0.875rem",
-  fontFamily: "var(--font-body), sans-serif",
-  fontWeight: 300,
-  outline: "none",
-  transition: "border-color 0.2s",
-}
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontFamily: "var(--font-mono), monospace",
-  fontSize: "0.65rem",
-  letterSpacing: "0.18em",
-  textTransform: "uppercase",
-  color: "#5a6a85",
-  marginBottom: "0.5rem",
-}
+const serviceOptions = [
+  { value: "power", label: "Power Distribution Design" },
+  { value: "lighting", label: "Lighting Design" },
+  { value: "emergency", label: "Emergency / Standby Systems" },
+  { value: "arc-flash", label: "Short Circuit & Arc Flash Study" },
+  { value: "street-lighting", label: "Street & Site Lighting" },
+  { value: "ev", label: "EV Infrastructure" },
+  { value: "other", label: "Other / General Inquiry" },
+]
 
 export function Contact() {
   const [submitted, setSubmitted] = useState(false)
+  const [projectType, setProjectType] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const formRef = useRef<HTMLFormElement>(null)
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setSubmitted(true)
+    const formData = new FormData(e.currentTarget)
+    // Inject the controlled Select value since base-ui Select uses a hidden input
+    if (projectType) formData.set("projectType", projectType)
+
+    const toastId = toast.loading("Sending your inquiry…")
+
+    startTransition(async () => {
+      const result = await submitContactForm(formData)
+
+      if ("error" in result) {
+        toast.error(result.error, {
+          id: toastId,
+          description: "Please try again or email us directly at abram.largoza@arclight-eng.com",
+          duration: 6000,
+        })
+      } else {
+        toast.success("Inquiry sent!", {
+          id: toastId,
+          description: "Arclight Engineering will respond within 24 business hours.",
+          duration: 5000,
+        })
+        setSubmitted(true)
+        formRef.current?.reset()
+        setProjectType(null)
+      }
+    })
   }
 
   return (
@@ -103,9 +135,7 @@ export function Contact() {
               gap: "0.8rem",
             }}
           >
-            <span
-              style={{ display: "block", width: "2rem", height: "1px", background: "#4da6ff", flexShrink: 0 }}
-            />
+            <span style={{ display: "block", width: "2rem", height: "1px", background: "#4da6ff", flexShrink: 0 }} />
             Contact
           </div>
 
@@ -138,10 +168,7 @@ export function Contact() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {contactItems.map((item) => (
-              <div
-                key={item.label}
-                style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}
-              >
+              <div key={item.label} style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
                 <div
                   style={{
                     width: 36,
@@ -172,12 +199,7 @@ export function Contact() {
                   {item.href ? (
                     <a
                       href={item.href}
-                      style={{
-                        fontSize: "0.9rem",
-                        color: "#c8d4e8",
-                        textDecoration: "none",
-                        transition: "color 0.2s",
-                      }}
+                      style={{ fontSize: "0.9rem", color: "#c8d4e8", textDecoration: "none", transition: "color 0.2s" }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#4da6ff")}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "#c8d4e8")}
                     >
@@ -221,112 +243,83 @@ export function Contact() {
               </p>
             </div>
           ) : (
-            <form
-              onSubmit={handleSubmit}
-              style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}
-            >
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-                <div>
-                  <label style={labelStyle}>First Name</label>
-                  <input
-                    type="text"
-                    placeholder="John"
-                    required
-                    style={inputStyle}
-                    onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                    onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
-                  />
+            <form ref={formRef} onSubmit={handleSubmit}>
+              <FieldGroup>
+                {/* First / Last name row */}
+                <div className="grid grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel>First Name</FieldLabel>
+                    <Input name="firstName" placeholder="John" required />
+                  </Field>
+                  <Field>
+                    <FieldLabel>Last Name</FieldLabel>
+                    <Input name="lastName" placeholder="Smith" required />
+                  </Field>
                 </div>
-                <div>
-                  <label style={labelStyle}>Last Name</label>
-                  <input
-                    type="text"
-                    placeholder="Smith"
-                    required
-                    style={inputStyle}
-                    onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                    onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
+
+                <Field>
+                  <FieldLabel>Company / Agency</FieldLabel>
+                  <Input name="company" placeholder="Your organization" />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Email</FieldLabel>
+                  <Input name="email" type="email" placeholder="you@company.com" required />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Project Type</FieldLabel>
+                  <Select value={projectType} onValueChange={setProjectType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="— Select a service area —" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {serviceOptions.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </Field>
+
+                <Field>
+                  <FieldLabel>Project Description</FieldLabel>
+                  <Textarea
+                    name="description"
+                    rows={5}
+                    placeholder="Brief description of your project scope, timeline, and location..."
                   />
-                </div>
-              </div>
+                </Field>
 
-              <div>
-                <label style={labelStyle}>Company / Agency</label>
-                <input
-                  type="text"
-                  placeholder="Your organization"
-                  style={inputStyle}
-                  onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                  onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
-                />
-              </div>
-
-              <div>
-                <label style={labelStyle}>Email</label>
-                <input
-                  type="email"
-                  placeholder="you@company.com"
-                  required
-                  style={inputStyle}
-                  onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                  onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
-                />
-              </div>
-
-              <div>
-                <label style={labelStyle}>Project Type</label>
-                <select
-                  style={{ ...inputStyle, cursor: "pointer" }}
-                  onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                  onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  style={{
+                    fontFamily: "var(--font-mono), monospace",
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.15em",
+                    textTransform: "uppercase",
+                    background: isPending ? "#2a5a8a" : "#4da6ff",
+                    color: "#080a0f",
+                    border: "none",
+                    padding: "1rem",
+                    cursor: isPending ? "not-allowed" : "pointer",
+                    transition: "box-shadow 0.2s, background 0.2s",
+                    fontWeight: 600,
+                    width: "100%",
+                    opacity: isPending ? 0.7 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isPending) (e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(77,166,255,0.4)"
+                  }}
+                  onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.boxShadow = "none")}
                 >
-                  <option value="">— Select a service area —</option>
-                  <option>Power Distribution Design</option>
-                  <option>Lighting Design</option>
-                  <option>Emergency / Standby Systems</option>
-                  <option>Short Circuit &amp; Arc Flash Study</option>
-                  <option>Street &amp; Site Lighting</option>
-                  <option>EV Infrastructure</option>
-                  <option>Other / General Inquiry</option>
-                </select>
-              </div>
-
-              <div>
-                <label style={labelStyle}>Project Description</label>
-                <textarea
-                  rows={5}
-                  placeholder="Brief description of your project scope, timeline, and location..."
-                  style={{ ...inputStyle, resize: "vertical" }}
-                  onFocus={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#4da6ff")}
-                  onBlur={(e) => ((e.currentTarget as HTMLElement).style.borderColor = "#1e2535")}
-                />
-              </div>
-
-              <button
-                type="submit"
-                style={{
-                  fontFamily: "var(--font-mono), monospace",
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.15em",
-                  textTransform: "uppercase",
-                  background: "#4da6ff",
-                  color: "#080a0f",
-                  border: "none",
-                  padding: "1rem",
-                  cursor: "pointer",
-                  transition: "box-shadow 0.2s",
-                  fontWeight: 600,
-                  width: "100%",
-                }}
-                onMouseEnter={(e) =>
-                  ((e.currentTarget as HTMLElement).style.boxShadow = "0 0 24px rgba(77,166,255,0.4)")
-                }
-                onMouseLeave={(e) =>
-                  ((e.currentTarget as HTMLElement).style.boxShadow = "none")
-                }
-              >
-                Send Inquiry
-              </button>
+                  {isPending ? "Sending…" : "Send Inquiry"}
+                </button>
+              </FieldGroup>
             </form>
           )}
         </div>

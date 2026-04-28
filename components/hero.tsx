@@ -332,8 +332,7 @@ export function Hero() {
         }}
       >
         {[
-          { num: "15+", label: "Years Experience" },
-          { num: "200+", label: "Projects Delivered" },
+          { num: "12+", label: "Years Experience" },
           { num: "CA", label: "Licensed PE · LC" },
         ].map((s) => (
           <div key={s.label}>

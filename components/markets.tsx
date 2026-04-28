@@ -3,7 +3,7 @@
 const markets = [
   {
     name: "Commercial & Retail",
-    desc: "Office buildings, retail centers, mixed-use developments, and restaurant/hospitality facilities with Title 24 and LADBS compliance.",
+    desc: "Office buildings, retail centers, mixed-use developments, and restaurant/hospitality facilities with Title 24 compliance.",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 22, height: 22 }}>
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

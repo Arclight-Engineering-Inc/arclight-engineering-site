@@ -1,9 +1,9 @@
 const items = [
   { label: "Codes & Standards", value: "NEC 2023 · NFPA 70 · NFPA 110" },
-  { label: "Analysis Software", value: "ETAP · AGi32 · Bluebeam" },
+  { label: "Analysis Software", value: "ETAP · Lithonia Visual · Bluebeam" },
   { label: "Certifications", value: "CA Licensed PE · LC" },
   { label: "Energy Compliance", value: "Title 24 Part 6 · CalGreen" },
-  { label: "AHJ Experience", value: "DSA · LADBS · CEC" },
+  { label: "AHJ Experience", value: "DSA · CEC" },
 ]
 
 export function ExpertiseBand() {

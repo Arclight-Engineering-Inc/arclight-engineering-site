@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Barlow, Barlow_Condensed, Share_Tech_Mono } from "next/font/google"
 
 import "./globals.css"
+import { Toaster } from "@/components/ui/sonner"
 
 const barlow = Barlow({
   subsets: ["latin"],
@@ -48,7 +49,10 @@ export default function RootLayout({
       className={`${barlow.variable} ${barlowCondensed.variable} ${shareTechMono.variable}`}
       suppressHydrationWarning
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster theme="dark" position="bottom-right" richColors />
+      </body>
     </html>
   )
 }

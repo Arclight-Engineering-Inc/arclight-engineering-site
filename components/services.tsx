@@ -63,7 +63,7 @@ const services = [
   {
     num: "05",
     title: "Street & Site Lighting",
-    desc: "SCE LS-1 cabinet design, IES roadway classifications, photometric modeling, and NEC-compliant street lighting distribution systems for public agencies.",
+    desc: "IES roadway classifications, photometric modeling, and NEC-compliant street lighting distribution systems for public agencies.",
     icon: (
       <svg viewBox="0 0 44 44" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ width: 44, height: 44, color: "#4da6ff" }}>
         <path d="M8 34 L8 18 L22 8 L36 18 L36 34 Z" />

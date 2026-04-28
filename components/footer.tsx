@@ -171,7 +171,7 @@ export function Footer() {
               "NFPA 70 · NEC 2023",
               "IEEE 1584 Arc Flash",
               "Title 24 Part 6",
-              "DSA · LADBS",
+              "DSA · CEC",
             ].map((c) => (
               <div key={c} style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
                 <span style={{ color: "#4da6ff", fontSize: "0.5rem" }}>◆</span>

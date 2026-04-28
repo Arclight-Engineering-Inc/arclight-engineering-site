@@ -7,7 +7,7 @@ const credentials = [
   "NEC 2023 / NFPA 70 / NFPA 110 Compliant Design",
   "IEEE 1584 Arc Flash Analysis",
   "Title 24 Part 6 Energy Code Expertise",
-  "DSA & LADBS Submittal Experience",
+  "DSA Submittal Experience",
   "CalGreen Compliance Documentation",
 ]
 

@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   /* Brand fonts */
@@ -6,18 +10,63 @@
   --font-heading: var(--font-heading);
   --font-mono: var(--font-mono);
 
-  /* Arc brand colors */
+  /* Shadcn semantic tokens → Tailwind utilities */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  /* Arc brand colors as utilities */
   --color-arc-black: #080a0f;
   --color-arc-dark: #0d1017;
   --color-arc-panel: #111520;
   --color-arc-border: #1e2535;
   --color-arc-blue: #4da6ff;
-  --color-arc-blue-dim: #1a3a5c;
   --color-arc-amber: #f5a623;
-  --color-arc-amber-dim: #a06800;
   --color-arc-text: #c8d4e8;
   --color-arc-text-dim: #5a6a85;
   --color-arc-white: #f0f4ff;
+}
+
+/* Dark brand theme as the only theme — site is always dark */
+:root {
+  --background: #080a0f;
+  --foreground: #c8d4e8;
+  --card: #111520;
+  --card-foreground: #c8d4e8;
+  --popover: #111520;
+  --popover-foreground: #c8d4e8;
+  --primary: #4da6ff;
+  --primary-foreground: #080a0f;
+  --secondary: #111520;
+  --secondary-foreground: #c8d4e8;
+  --muted: #111520;
+  --muted-foreground: #5a6a85;
+  --accent: #1e2535;
+  --accent-foreground: #f0f4ff;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #1e2535;
+  --input: #1e2535;
+  --ring: #4da6ff;
+  --radius: 0.375rem;
 }
 
 * {
@@ -31,16 +80,14 @@ html {
 }
 
 body {
-  background: #080a0f;
-  color: #c8d4e8;
+  background: var(--background);
+  color: var(--foreground);
   font-family: var(--font-body), sans-serif;
   font-weight: 300;
   overflow-x: hidden;
-  cursor: default;
-  /* Subtle noise overlay */
-  position: relative;
 }
 
+/* Subtle noise texture overlay */
 body::before {
   content: "";
   position: fixed;
@@ -49,17 +96,4 @@ body::before {
   opacity: 0.022;
   pointer-events: none;
   z-index: 999;
-}
-
-/* Typography helpers */
-.font-heading {
-  font-family: var(--font-heading), sans-serif;
-}
-
-.font-mono {
-  font-family: var(--font-mono), monospace;
-}
-
-.font-body {
-  font-family: var(--font-body), sans-serif;
 }

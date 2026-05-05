@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Barlow, Barlow_Condensed, Share_Tech_Mono } from "next/font/google"
 
 import "./globals.css"
+import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 
 const barlow = Barlow({
@@ -23,7 +24,8 @@ const shareTechMono = Share_Tech_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Arclight Engineering Inc. — Electrical Power & Lighting Design",
+  metadataBase: new URL("https://arclight-eng.com"),
+  title: "Arclight Engineering Inc. | Electrical Power & Lighting Design",
   description:
     "Irvine-based electrical engineering consulting firm specializing in power systems and lighting design for commercial, educational, and private owners across Southern California.",
   keywords: [
@@ -36,6 +38,37 @@ export const metadata: Metadata = {
     "arc flash",
     "EV infrastructure",
   ],
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
+  },
+  openGraph: {
+    title: "Arclight Engineering Inc.",
+    description:
+      "Electrical power and lighting design for Southern California commercial and institutional projects.",
+    url: "/",
+    siteName: "Arclight Engineering",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Arclight Engineering logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Arclight Engineering Inc.",
+    description:
+      "Electrical power and lighting design for Southern California commercial and institutional projects.",
+    images: ["/og-image.png"],
+  },
 }
 
 export default function RootLayout({
@@ -50,8 +83,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        {children}
-        <Toaster theme="dark" position="bottom-right" richColors />
+        <ThemeProvider>
+          {children}
+          <Toaster position="bottom-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   )

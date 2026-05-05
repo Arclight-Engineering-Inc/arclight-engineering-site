@@ -1,0 +1,2 @@
+[   16292ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3010/_next/image?url=%2Flogos%2FArclight-01.png&w=256&q=75:0
+[   23894ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:3010/_next/image?url=%2Flogos%2FArclight-03.png&w=32&q=75:0

@@ -1,76 +1,116 @@
 const phases = [
   {
-    num: "Phase 01",
+    num: "01",
     title: "Discovery & Programming",
-    desc: "Project kickoff, utility coordination, load assessment, applicable code research, and design criteria establishment.",
+    desc: "Kickoff, utility coordination, load assessment, and design criteria. We surface the constraints before they become RFIs.",
+    deliverables: ["Basis of Design", "Utility Coord. Memo", "Load Calc Draft"],
   },
   {
-    num: "Phase 02",
+    num: "02",
     title: "Schematic & Design Development",
-    desc: "Single-line diagrams, fault current analysis, photometric modeling, and equipment selection with owner review.",
+    desc: "Single-line diagrams, fault current and photometric analysis, equipment selection. Owner reviews at SD and DD with red-line cycles.",
+    deliverables: ["One-Line Diagram", "Photometrics", "Equipment Cuts"],
   },
   {
-    num: "Phase 03",
+    num: "03",
     title: "Construction Documents",
-    desc: "Permit-ready drawings, technical specifications, and bid-package coordination. Agency and DSA submittals as required.",
+    desc: "Permit-ready drawings, technical specifications, and bid coordination. DSA and agency submittals as required.",
+    deliverables: ["100% CDs", "Specs", "AHJ Submittal"],
   },
   {
-    num: "Phase 04",
+    num: "04",
     title: "Construction Administration",
-    desc: "RFI responses, submittal review, field observations, and punch-list coordination through final project closeout and permit sign-off.",
+    desc: "RFIs, submittal review, field observation, and punch list through closeout. Permits signed off, owner walkthrough complete.",
+    deliverables: ["RFI Log", "Field Reports", "Closeout Package"],
   },
 ]
 
 export function Process() {
   return (
-    <section id="process" style={{ padding: "7rem 3rem", background: "#080a0f" }}>
+    <section
+      id="process"
+      style={{
+        padding: "8rem 3rem",
+        background: "var(--section-alt)",
+        position: "relative",
+        scrollMarginTop: "5rem",
+      }}
+      className="process-section"
+    >
       <div
         style={{
-          fontFamily: "var(--font-mono), monospace",
-          fontSize: "0.68rem",
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          color: "#4da6ff",
-          marginBottom: "1rem",
-          display: "flex",
-          alignItems: "center",
-          gap: "0.8rem",
+          display: "grid",
+          gridTemplateColumns: "minmax(260px, 1fr) 2fr",
+          gap: "4rem",
+          marginBottom: "5rem",
+          alignItems: "end",
         }}
+        className="process-header"
       >
-        <span style={{ display: "block", width: "2rem", height: "1px", background: "#4da6ff", flexShrink: 0 }} />
-        Our Approach
+        <div>
+          <div
+            className="tech-mono"
+            style={{
+              fontSize: "0.75rem",
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "var(--primary)",
+              marginBottom: "1.25rem",
+            }}
+          >
+            (04) Approach
+          </div>
+          <div
+            style={{
+              fontFamily: "var(--font-mono), monospace",
+              fontSize: "0.78rem",
+              letterSpacing: "0.12em",
+              color: "var(--text-faint)",
+              lineHeight: 1.7,
+            }}
+          >
+            Four phases.
+            <br />
+            No black boxes.
+          </div>
+        </div>
+        <div>
+          <h2
+            className="display"
+            style={{
+              fontWeight: 700,
+              fontSize: "clamp(2.4rem, 5vw, 4rem)",
+              color: "var(--heading)",
+              lineHeight: 1.02,
+              letterSpacing: "-0.02em",
+              marginBottom: "1.5rem",
+            }}
+          >
+            Concept to
+            <span style={{ color: "var(--primary)" }}> closeout</span>, on a schedule
+            you can plan around.
+          </h2>
+          <p
+            style={{
+              color: "var(--text-soft)",
+              fontSize: "1rem",
+              lineHeight: 1.7,
+              maxWidth: "640px",
+            }}
+          >
+            Every phase ends with a deliverable in your inbox and a checkpoint
+            on the calendar. You always know what&apos;s being engineered, what
+            arrives next, and when.
+          </p>
+        </div>
       </div>
-      <h2
-        style={{
-          fontFamily: "var(--font-heading), sans-serif",
-          fontWeight: 700,
-          fontSize: "clamp(2.2rem, 4vw, 3.5rem)",
-          textTransform: "uppercase",
-          color: "#f0f4ff",
-          lineHeight: 1,
-          marginBottom: "1rem",
-        }}
-      >
-        From Concept to Closeout
-      </h2>
-      <p
-        style={{
-          color: "#5a6a85",
-          fontSize: "0.95rem",
-          lineHeight: 1.8,
-          maxWidth: "500px",
-          marginBottom: "4rem",
-        }}
-      >
-        A structured engineering process ensures code compliance, constructability, and client confidence at
-        every milestone.
-      </p>
 
+      {/* Phase cards */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "0",
+          gap: "1.5rem",
           position: "relative",
         }}
         className="process-steps"
@@ -79,11 +119,12 @@ export function Process() {
         <div
           style={{
             position: "absolute",
-            top: "1.75rem",
-            left: "2.5rem",
-            right: "2.5rem",
+            top: "1.4rem",
+            left: 0,
+            right: 0,
             height: "1px",
-            background: "#1e2535",
+            background:
+              "linear-gradient(90deg, var(--primary) 0%, var(--line) 12%, var(--line) 88%, transparent)",
             zIndex: 0,
           }}
           className="process-line"
@@ -93,86 +134,122 @@ export function Process() {
           <div
             key={p.num}
             style={{
-              padding: "0 2rem 0 0",
               position: "relative",
               zIndex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: "1.25rem",
             }}
+            className="process-step"
           >
-            {/* Step dot */}
+            {/* Marker */}
             <div
               style={{
-                width: "3.5rem",
-                height: "3.5rem",
-                border: "1px solid #1e2535",
-                background: "#080a0f",
+                width: "2.8rem",
+                height: "2.8rem",
+                border: "1px solid var(--line)",
+                background: i === 0 ? "var(--primary)" : "var(--section-alt)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: "1.5rem",
                 position: "relative",
+                fontFamily: "var(--font-mono), monospace",
+                fontSize: "0.78rem",
+                letterSpacing: "0.1em",
+                color: i === 0 ? "var(--section-alt)" : "var(--text-faint)",
+                fontWeight: 600,
+                transition: "all 0.3s",
               }}
+              className="process-marker"
             >
-              <div
-                style={{
-                  width: 8,
-                  height: 8,
-                  background: i === 0 ? "#4da6ff" : "#1e2535",
-                  transition: "background 0.3s",
-                }}
-              />
-              {/* Blue top accent on first */}
-              {i === 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: -1,
-                    left: 0,
-                    right: 0,
-                    height: 2,
-                    background: "#4da6ff",
-                  }}
-                />
-              )}
+              {p.num}
             </div>
 
             <div
               style={{
-                fontFamily: "var(--font-mono), monospace",
-                fontSize: "0.65rem",
-                color: "#4da6ff",
-                letterSpacing: "0.2em",
-                marginBottom: "0.6rem",
-              }}
-            >
-              {p.num}
-            </div>
-            <div
-              style={{
                 fontFamily: "var(--font-heading), sans-serif",
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: "1.1rem",
-                textTransform: "uppercase",
-                color: "#f0f4ff",
-                letterSpacing: "0.03em",
-                marginBottom: "0.75rem",
-                lineHeight: 1.2,
+                color: "var(--heading)",
+                letterSpacing: "-0.005em",
+                lineHeight: 1.25,
               }}
             >
               {p.title}
             </div>
-            <p style={{ fontSize: "0.875rem", color: "#5a6a85", lineHeight: 1.75 }}>{p.desc}</p>
+
+            <p
+              style={{
+                fontSize: "0.88rem",
+                color: "var(--text-soft)",
+                lineHeight: 1.65,
+              }}
+            >
+              {p.desc}
+            </p>
+
+            {/* Deliverables */}
+            <div
+              style={{
+                marginTop: "auto",
+                paddingTop: "1.25rem",
+                borderTop: "1px dashed var(--line)",
+              }}
+            >
+              <div
+                className="tech-mono"
+                style={{
+                  fontSize: "0.72rem",
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: "var(--text-faint)",
+                  marginBottom: "0.6rem",
+                }}
+              >
+                Deliverables
+              </div>
+              <ul
+                style={{
+                  listStyle: "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.3rem",
+                }}
+              >
+                {p.deliverables.map((d) => (
+                  <li
+                    key={d}
+                    style={{
+                      fontFamily: "var(--font-mono), monospace",
+                      fontSize: "0.78rem",
+                      color: "var(--foreground)",
+                      letterSpacing: "0.04em",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                    }}
+                  >
+                    <span style={{ color: "var(--primary)", fontSize: "0.72rem" }}>
+                      ◆
+                    </span>
+                    {d}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ))}
       </div>
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
+          .process-header { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
           .process-steps { grid-template-columns: repeat(2, 1fr) !important; gap: 2.5rem !important; }
           .process-line { display: none !important; }
         }
         @media (max-width: 600px) {
           .process-steps { grid-template-columns: 1fr !important; }
-          #process { padding: 4rem 1.5rem !important; }
+          .process-section { padding: 5rem 1.5rem !important; }
         }
       `}</style>
     </section>

@@ -1,435 +1,256 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import Image from "next/image"
 
 export function Hero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext("2d")
-    if (!ctx) return
-
-    function resize() {
-      if (!canvas) return
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
-    }
-    resize()
-    window.addEventListener("resize", resize)
-
-    const GRID = 60
-    type ArcObj = { x1: number; y1: number; x2: number; y2: number; t: number; speed: number }
-    type Node = { x: number; y: number; pulse: number; speed: number }
-
-    const nodes: Node[] = []
-    const arcs: ArcObj[] = []
-
-    function initNodes() {
-      nodes.length = 0
-      const cols = Math.ceil(canvas!.width / GRID) + 1
-      const rows = Math.ceil(canvas!.height / GRID) + 1
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          nodes.push({
-            x: c * GRID,
-            y: r * GRID,
-            pulse: Math.random(),
-            speed: 0.003 + Math.random() * 0.005,
-          })
-        }
-      }
-    }
-    initNodes()
-    window.addEventListener("resize", initNodes)
-
-    function spawnArc() {
-      if (!canvas) return
-      const src = nodes[Math.floor(Math.random() * nodes.length)]
-      const dirs: [number, number][] = [
-        [1, 0],
-        [0, 1],
-        [-1, 0],
-        [0, -1],
-      ]
-      const [dc, dr] = dirs[Math.floor(Math.random() * 4)]
-      const dst = { x: src.x + dc * GRID, y: src.y + dr * GRID }
-      if (dst.x < 0 || dst.y < 0 || dst.x > canvas.width || dst.y > canvas.height) return
-      arcs.push({ x1: src.x, y1: src.y, x2: dst.x, y2: dst.y, t: 0, speed: 0.015 + Math.random() * 0.02 })
-    }
-
-    let frame = 0
-    let rafId: number
-
-    function draw() {
-      if (!canvas || !ctx) return
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-      ctx.strokeStyle = "rgba(30,37,53,0.8)"
-      ctx.lineWidth = 0.5
-      for (let x = 0; x <= canvas.width; x += GRID) {
-        ctx.beginPath()
-        ctx.moveTo(x, 0)
-        ctx.lineTo(x, canvas.height)
-        ctx.stroke()
-      }
-      for (let y = 0; y <= canvas.height; y += GRID) {
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(canvas.width, y)
-        ctx.stroke()
-      }
-
-      nodes.forEach((n) => {
-        n.pulse = (n.pulse + n.speed) % 1
-        const alpha = 0.15 + Math.sin(n.pulse * Math.PI * 2) * 0.12
-        ctx.fillStyle = `rgba(77,166,255,${alpha})`
-        ctx.beginPath()
-        ctx.arc(n.x, n.y, 1.5, 0, Math.PI * 2)
-        ctx.fill()
-      })
-
-      if (frame % 18 === 0 && arcs.length < 12) spawnArc()
-
-      for (let i = arcs.length - 1; i >= 0; i--) {
-        const a = arcs[i]
-        a.t += a.speed
-        if (a.t >= 1) {
-          arcs.splice(i, 1)
-          continue
-        }
-        const cx = a.x1 + (a.x2 - a.x1) * a.t
-        const cy = a.y1 + (a.y2 - a.y1) * a.t
-
-        const grad = ctx.createLinearGradient(a.x1, a.y1, cx, cy)
-        grad.addColorStop(0, "rgba(77,166,255,0)")
-        grad.addColorStop(1, "rgba(77,166,255,0.6)")
-        ctx.strokeStyle = grad
-        ctx.lineWidth = 1.5
-        ctx.beginPath()
-        ctx.moveTo(a.x1, a.y1)
-        ctx.lineTo(cx, cy)
-        ctx.stroke()
-
-        const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, 6)
-        grd.addColorStop(0, "rgba(77,166,255,0.9)")
-        grd.addColorStop(1, "rgba(77,166,255,0)")
-        ctx.fillStyle = grd
-        ctx.beginPath()
-        ctx.arc(cx, cy, 6, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      frame++
-      rafId = requestAnimationFrame(draw)
-    }
-    draw()
-
-    return () => {
-      cancelAnimationFrame(rafId)
-      window.removeEventListener("resize", resize)
-      window.removeEventListener("resize", initNodes)
-    }
-  }, [])
-
   return (
-    <section
-      style={{
-        position: "relative",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        padding: "0 3rem",
-        overflow: "hidden",
-      }}
-    >
-      {/* Animated canvas background */}
-      <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-        <canvas
-          ref={canvasRef}
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-        />
+    <section className="hero-section">
+      <div className="hero-frame" aria-hidden>
+        <div className="hero-gridlines" />
       </div>
 
-      {/* Diagonal right panel */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: "42%",
-          background: "#111520",
-          clipPath: "polygon(12% 0, 100% 0, 100% 100%, 0% 100%)",
-          borderLeft: "1px solid #1e2535",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingLeft: "8%",
-          }}
-        >
-          <CircuitSvg />
-        </div>
-      </div>
-
-      {/* Hero content */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 2,
-          maxWidth: "55%",
-          animation: "fadeUp 1s ease both",
-        }}
-      >
-        <div
-          style={{
-            fontFamily: "var(--font-mono), monospace",
-            fontSize: "0.7rem",
-            letterSpacing: "0.25em",
-            textTransform: "uppercase",
-            color: "#4da6ff",
-            marginBottom: "1.5rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.8rem",
-          }}
-        >
-          <span
-            style={{ display: "block", width: "2rem", height: "1px", background: "#4da6ff", flexShrink: 0 }}
-          />
-          Licensed Electrical Engineering · Southern California
-        </div>
-
-        <h1
-          style={{
-            fontFamily: "var(--font-heading), sans-serif",
-            fontWeight: 800,
-            fontSize: "clamp(3.5rem, 7vw, 6.5rem)",
-            lineHeight: 0.92,
-            textTransform: "uppercase",
-            color: "#f0f4ff",
-            letterSpacing: "-0.01em",
-            marginBottom: "0.3rem",
-          }}
-        >
-          <span style={{ display: "block" }}>Power.</span>
-          <span
-            style={{
-              display: "block",
-              color: "transparent",
-              WebkitTextStroke: "1.5px #4da6ff",
-            }}
-          >
-            Light.
-          </span>
-          <span
-            style={{
-              display: "block",
-              color: "#4da6ff",
-              textShadow: "0 0 40px rgba(77,166,255,0.5), 0 0 80px rgba(77,166,255,0.2)",
-            }}
-          >
-            Precision.
-          </span>
-        </h1>
-
-        <p
-          style={{
-            fontSize: "1.05rem",
-            fontWeight: 300,
-            color: "#5a6a85",
-            maxWidth: "420px",
-            lineHeight: 1.7,
-            marginBottom: "2.8rem",
-            marginTop: "1.5rem",
-          }}
-        >
-          Arclight Engineering delivers rigorous, code-compliant electrical power and lighting design
-          for commercial, institutional, and infrastructure projects across Southern California.
+      <div className="hero-content arc-rise">
+        <p className="hero-kicker">Electrical power and lighting design</p>
+        <h1>Power and lighting plans that pass review.</h1>
+        <p className="hero-copy">
+          Arclight delivers permit-ready electrical drawings for Southern
+          California commercial and institutional projects.
         </p>
-
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
-          <a
-            href="#contact"
-            style={{
-              fontFamily: "var(--font-mono), monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              background: "#4da6ff",
-              color: "#080a0f",
-              border: "none",
-              padding: "0.9rem 2rem",
-              cursor: "pointer",
-              transition: "box-shadow 0.2s, transform 0.1s",
-              textDecoration: "none",
-              display: "inline-block",
-              fontWeight: 600,
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLElement
-              el.style.boxShadow = "0 0 24px rgba(77,166,255,0.5)"
-              el.style.transform = "translateY(-1px)"
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLElement
-              el.style.boxShadow = "none"
-              el.style.transform = "translateY(0)"
-            }}
-          >
-            Request a Proposal
+        <div className="hero-actions">
+          <a href="#contact" className="hero-button hero-button-primary">
+            Get an estimate
           </a>
-          <a
-            href="#services"
-            style={{
-              fontFamily: "var(--font-mono), monospace",
-              fontSize: "0.75rem",
-              letterSpacing: "0.15em",
-              textTransform: "uppercase",
-              background: "transparent",
-              color: "#c8d4e8",
-              border: "1px solid #1e2535",
-              padding: "0.9rem 2rem",
-              cursor: "pointer",
-              transition: "border-color 0.2s, color 0.2s",
-              textDecoration: "none",
-              display: "inline-block",
-            }}
-            onMouseEnter={(e) => {
-              const el = e.currentTarget as HTMLElement
-              el.style.borderColor = "#c8d4e8"
-              el.style.color = "#f0f4ff"
-            }}
-            onMouseLeave={(e) => {
-              const el = e.currentTarget as HTMLElement
-              el.style.borderColor = "#1e2535"
-              el.style.color = "#c8d4e8"
-            }}
-          >
-            Our Services
+          <a href="#solutions" className="hero-button hero-button-secondary">
+            View solutions
           </a>
+        </div>
+        <div className="hero-logo-lockup" aria-hidden>
+          <Image
+            src="/logos/Arclight-03.png"
+            alt=""
+            width={2500}
+            height={2500}
+            priority
+          />
         </div>
       </div>
 
-      {/* Stats */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "3rem",
-          left: "3rem",
-          display: "flex",
-          gap: "3rem",
-          animation: "fadeUp 1s 0.4s ease both",
-        }}
-      >
-        {[
-          { num: "12+", label: "Years Experience" },
-          { num: "CA", label: "Licensed PE · LC" },
-        ].map((s) => (
-          <div key={s.label}>
-            <div
-              style={{
-                fontFamily: "var(--font-heading), sans-serif",
-                fontWeight: 700,
-                fontSize: "2rem",
-                color: "#f0f4ff",
-                lineHeight: 1,
-              }}
-            >
-              {s.num.includes("+") ? (
-                <>
-                  {s.num.replace("+", "")}
-                  <span style={{ color: "#4da6ff" }}>+</span>
-                </>
-              ) : (
-                <span style={{ color: "#4da6ff" }}>{s.num}</span>
-              )}
-            </div>
-            <div
-              style={{
-                fontFamily: "var(--font-mono), monospace",
-                fontSize: "0.65rem",
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "#5a6a85",
-                marginTop: "0.3rem",
-              }}
-            >
-              {s.label}
-            </div>
-          </div>
-        ))}
+      <div className="hero-proof" aria-label="Credentials">
+        <span>CA P.E.</span>
+        <span>LC</span>
+        <span>NEC</span>
+        <span>Title 24</span>
       </div>
 
       <style>{`
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to { opacity: 1; transform: translateY(0); }
+        .hero-section {
+          position: relative;
+          min-height: min(780px, 92vh);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          padding: 7.5rem 3rem 4rem;
+          background:
+            radial-gradient(circle at 50% 78%, color-mix(in srgb, var(--primary) 20%, transparent), transparent 28rem),
+            var(--background);
+          border-bottom: 1px solid var(--line);
         }
+
+        .hero-frame {
+          position: absolute;
+          inset: 4.5rem 5vw 2.5rem;
+          max-width: 1180px;
+          margin: 0 auto;
+          overflow: hidden;
+          border-left: 1px solid var(--line);
+          border-right: 1px solid var(--line);
+          opacity: 0.95;
+        }
+
+        .hero-frame::before,
+        .hero-frame::after {
+          content: "";
+          position: absolute;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: var(--line);
+        }
+
+        .hero-frame::before {
+          top: 0;
+        }
+
+        .hero-frame::after {
+          bottom: 0;
+        }
+
+        .hero-gridlines {
+          position: absolute;
+          inset: 1px;
+          background-image:
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+          background-size: 90px 90px;
+          background-position: 45px 0;
+          mask-image: linear-gradient(to bottom, transparent, black 12%, black 86%, transparent);
+        }
+
+        .hero-content {
+          position: relative;
+          z-index: 2;
+          width: min(820px, 100%);
+          margin: 0 auto;
+          text-align: center;
+          padding-bottom: 3.5rem;
+        }
+
+        .hero-kicker {
+          margin-bottom: 1.2rem;
+          font-family: var(--font-mono), monospace;
+          font-size: 0.78rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--primary);
+        }
+
+        .hero-content h1 {
+          max-width: 900px;
+          margin: 0 auto;
+          color: var(--heading);
+          font-family: var(--font-heading), sans-serif;
+          font-size: clamp(3rem, 7.6vw, 6.8rem);
+          font-weight: 700;
+          line-height: 0.92;
+          letter-spacing: 0;
+        }
+
+        .hero-copy {
+          max-width: 620px;
+          margin: 1.55rem auto 0;
+          color: var(--text-soft);
+          font-size: clamp(1rem, 1.5vw, 1.25rem);
+          line-height: 1.55;
+        }
+
+        .hero-actions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 0.9rem;
+          margin-top: 2rem;
+        }
+
+        .hero-logo-lockup {
+          display: flex;
+          width: clamp(124px, 15vw, 188px);
+          aspect-ratio: 1;
+          align-items: center;
+          justify-content: center;
+          margin: 2.25rem auto 0;
+          filter: drop-shadow(0 24px 52px color-mix(in srgb, var(--primary) 18%, transparent));
+          opacity: 0.96;
+        }
+
+        .hero-logo-lockup img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .hero-button {
+          display: inline-flex;
+          min-height: 46px;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          padding: 0 1.45rem;
+          font-size: 0.95rem;
+          font-weight: 600;
+          text-decoration: none;
+          transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+        }
+
+        .hero-button:hover {
+          transform: translateY(-1px);
+        }
+
+        .hero-button-primary {
+          border: 1px solid var(--heading);
+          background: var(--heading);
+          color: var(--background);
+        }
+
+        .hero-button-secondary {
+          border: 1px solid var(--line-strong);
+          background: color-mix(in srgb, var(--background) 82%, transparent);
+          color: var(--heading);
+        }
+
+        .hero-proof {
+          position: absolute;
+          z-index: 2;
+          right: 3rem;
+          bottom: 2rem;
+          left: 3rem;
+          display: flex;
+          justify-content: center;
+          gap: clamp(1.2rem, 4vw, 3.5rem);
+          color: var(--text-faint);
+          font-family: var(--font-mono), monospace;
+          font-size: 0.76rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
         @media (max-width: 768px) {
-          section > div[style*="max-width: 55%"] { max-width: 100% !important; }
-          section > div[style*="width: 42%"] { display: none !important; }
-          section { padding: 0 1.5rem !important; }
+          .hero-section {
+            min-height: 760px;
+            align-items: flex-start;
+            padding: 6.5rem 1.4rem 4rem;
+          }
+
+          .hero-frame {
+            inset: 4.8rem 1.2rem 2rem;
+          }
+
+          .hero-gridlines {
+            background-size: 64px 64px;
+          }
+
+          .hero-content {
+            padding-top: 2rem;
+            padding-bottom: 0;
+            text-align: left;
+          }
+
+          .hero-content h1 {
+            font-size: clamp(3rem, 14vw, 4.4rem);
+          }
+
+          .hero-copy {
+            margin-left: 0;
+          }
+
+          .hero-actions {
+            justify-content: flex-start;
+          }
+
+          .hero-logo-lockup {
+            width: 142px;
+            margin: 2rem 0 0;
+          }
+
+          .hero-proof {
+            right: 1.5rem;
+            left: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            row-gap: 0.7rem;
+          }
         }
       `}</style>
     </section>
-  )
-}
-
-function CircuitSvg() {
-  return (
-    <svg
-      viewBox="0 0 280 340"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{
-        width: "90%",
-        opacity: 0.55,
-        animation: "circuitGlow 4s ease-in-out infinite",
-      }}
-    >
-      <style>{`
-        @keyframes circuitGlow {
-          0%, 100% { filter: drop-shadow(0 0 6px rgba(77,166,255,0.3)); }
-          50% { filter: drop-shadow(0 0 16px rgba(77,166,255,0.7)); }
-        }
-      `}</style>
-      <path d="M40 40 H120 V80 H240" stroke="#4da6ff" strokeWidth="1.5" />
-      <path d="M40 40 V180 H100" stroke="#4da6ff" strokeWidth="1.5" />
-      <path d="M100 180 V240 H200 V300" stroke="#4da6ff" strokeWidth="1.5" />
-      <path d="M240 80 V160 H180 V240" stroke="#4da6ff" strokeWidth="1.5" />
-      <path d="M180 240 H140 V300" stroke="#4da6ff" strokeWidth="1.5" />
-      <path d="M40 120 H80 V160 H180 V160" stroke="#4da6ff" strokeWidth="1" />
-      <path d="M240 160 V260 H200" stroke="#4da6ff" strokeWidth="1" />
-      <rect x="34" y="34" width="12" height="12" fill="none" stroke="#4da6ff" strokeWidth="1.2" />
-      <rect x="114" y="74" width="12" height="12" fill="none" stroke="#4da6ff" strokeWidth="1.2" />
-      <rect x="234" y="74" width="12" height="12" fill="none" stroke="#f5a623" strokeWidth="1.2" />
-      <rect x="174" y="234" width="12" height="12" fill="none" stroke="#4da6ff" strokeWidth="1.2" />
-      <rect x="194" y="294" width="12" height="12" fill="none" stroke="#f5a623" strokeWidth="1.2" />
-      <rect x="134" y="294" width="12" height="12" fill="none" stroke="#4da6ff" strokeWidth="1.2" />
-      <rect x="80" y="180" width="60" height="40" rx="2" fill="none" stroke="#4da6ff" strokeWidth="1.5" />
-      <text x="110" y="205" fill="#4da6ff" fontSize="8" fontFamily="monospace" textAnchor="middle">
-        MCU
-      </text>
-      <circle cx="40" cy="40" r="3" fill="#4da6ff" />
-      <circle cx="120" cy="80" r="3" fill="#4da6ff" />
-      <circle cx="240" cy="80" r="3" fill="#f5a623" />
-      <circle cx="100" cy="180" r="3" fill="#4da6ff" />
-      <circle cx="200" cy="240" r="3" fill="#4da6ff" />
-      <circle cx="180" cy="240" r="3" fill="#4da6ff" />
-      <circle cx="200" cy="300" r="3" fill="#f5a623" />
-      <circle cx="140" cy="300" r="3" fill="#4da6ff" />
-      <path d="M160 80 V120" stroke="#4da6ff" strokeWidth="0.8" strokeDasharray="3,3" />
-      <path d="M160 120 L156 112 M160 120 L164 112" stroke="#4da6ff" strokeWidth="0.8" />
-    </svg>
   )
 }

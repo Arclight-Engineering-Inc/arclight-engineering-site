@@ -2,7 +2,7 @@
 
 import { Resend } from "resend"
 
-// Hoist to module level — one instance per serverless function cold start
+// Hoist to module level for one instance per serverless function cold start.
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 export type ContactResult =
@@ -42,7 +42,7 @@ export async function submitContactForm(
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; color: #1a1a2e;">
       <h2 style="color: #1a1a2e; border-bottom: 2px solid #4da6ff; padding-bottom: 8px;">
-        New Inquiry — Arclight Engineering
+        New Inquiry - Arclight Engineering
       </h2>
 
       <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
@@ -61,7 +61,7 @@ export async function submitContactForm(
         </tr>` : ""}
         ${projectLabel ? `
         <tr>
-          <td style="padding: 8px 12px; font-weight: 600;">Service Area</td>
+          <td style="padding: 8px 12px; font-weight: 600;">Solution Area</td>
           <td style="padding: 8px 12px;">${projectLabel}</td>
         </tr>` : ""}
         ${description ? `
@@ -82,7 +82,7 @@ export async function submitContactForm(
       from: "Arclight Engineering <contact@arclight-eng.com>",
       to: ["abram.largoza@arclight-eng.com"],
       replyTo: email,
-      subject: `New Inquiry: ${projectLabel || "General"} — ${firstName} ${lastName}`,
+      subject: `New Inquiry: ${projectLabel || "General"} - ${firstName} ${lastName}`,
       html,
     },
     { idempotencyKey: `contact-inquiry/${email}/${Date.now()}` }
